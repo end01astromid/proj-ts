@@ -1,0 +1,19 @@
+###register
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+    "username": "lock15",
+    "email": "qweq112ew01011276672fp@gmail.com",
+    "password": 123456790
+}
+
+###login
+POST http://localhost:5000/auth/come-in
+Content-Type: application/json
+
+{
+    "email": "qweq112ew01011276672fp@gmail.com",
+    "password": 123456790
+}
+

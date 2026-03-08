@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { User } from '../model/user.js';
+// import {IUser} from '../usertypes.js'
 // import { middle_token } from '../middle-token/token.js'
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 const router = Router();
 router.post('/register', async (req, res) => {
     try {
+        // const body: RegisterUserDt = req.body
         const { username, email, password } = req.body;
         if (!username || !email || !password) {
             return res.status(400).json({ message: "заполните поле" });
@@ -14,7 +16,7 @@ router.post('/register', async (req, res) => {
         if (lookUser) {
             return res.status(400).json({ message: "Пользователь уже существует" });
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash((String(password)), 10);
         // Создаём нового пользователя
         const newUser = new User({ username, email, password: hashedPassword });
         await newUser.save();
@@ -25,30 +27,26 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ message: "Ошибка сервера" });
     }
 });
-//код на промисах
-//заменить лучшее async/await
-router.post('/come-in', (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({ message: "заполните поле" });
-    }
-    User.findOne({ email })
-        .then((user) => {
-        if (!user) {
-            throw { status: 400, message: "Пользователь не найден" };
+router.post('/come-in', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: "заполните поле" });
         }
-        return Promise.all([user, bcrypt.compare(password, user.password)])
-            .then(([user, isPasswordValid]) => {
-            if (!isPasswordValid) {
-                throw { status: 401, message: "Неверный пароль" };
-            }
-            const token1 = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET || "JWT_SECRET", { expiresIn: "24h" });
-            res.json({ message: "Успешный вход", token1 });
-        });
-    })
-        .catch((err) => {
-        const status = err.status || 500;
-        res.status(status).json({ message: err.message || "Ошибка сервера" });
-    });
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "Пользователь уже существует" });
+        }
+        const isMatch = await bcrypt.compare(String(password), String(user.password));
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Неверный email или пароль' });
+        }
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        return res.status(200).json({ token, user: { id: user._id, email: user.email } });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Ошибка сервера" });
+    }
 });
 export default router;

@@ -5,7 +5,6 @@ import authRouter from './routes/auth.js'
 import 'dotenv/config'; 
 
 
-
 const app = express();
 app.use(express.json());
 app.use(cors())

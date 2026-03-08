@@ -1,6 +1,8 @@
-export interface IUser {
+type keypassword = string | number 
+
+export type IUser = {
     username: string
     email: string
-    password: string
+    password: keypassword
     createdAt?: Date
 }
