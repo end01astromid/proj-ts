@@ -63,13 +63,7 @@ router.post('/come-in',async (req: Request<{},{}, UserBodyShema>, res: Response)
   }
 })
 
-router.post('/any',async (req: Request<{},{}, UserBodyShema>, res: Response)=>{
- try{
-        
- }catch{
 
- }
-})
 
 
 

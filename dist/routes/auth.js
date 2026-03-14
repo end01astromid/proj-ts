@@ -49,10 +49,4 @@ router.post('/come-in', async (req, res) => {
         res.status(500).json({ message: "Ошибка сервера" });
     }
 });
-router.post('/any', async (req, res) => {
-    try {
-    }
-    catch {
-    }
-});
 export default router;
